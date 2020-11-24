@@ -1,3 +1,10 @@
 I found it hard to keep track of what all the flashing lights mean.  This was helpful.
   https://revolutionrobotics.org/pages/troubleshooting-by-leds
+  
+I found a reference to enabling I2C bus in the raspbian image creation.  (that's a sign,
+I think)  Maybe add all of the revvy stuff to your hacking SD-card so you can switch back
+and forth between their framework and the hacking effort?
+  https://revolutionrobotics.org/pages/robot-framework-on-raspbian
+
+
 
