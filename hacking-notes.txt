@@ -1,0 +1,3 @@
+I found it hard to keep track of what all the flashing lights mean.  This was helpful.
+  https://revolutionrobotics.org/pages/troubleshooting-by-leds
+
