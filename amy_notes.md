@@ -1,8 +1,9 @@
-You can remove the SD card from the RR robot and boot it on a Raspberry Pi. However, the company has changed the defaut username/password so you can't log into it directly.
+# Hacking the Robot
+The RR robot has a Raspberry Pi under the hood and is running Raspbian. You can take out the SD card, put it on another Pi, and it will boot. However, the default username/password has been changed by Revolution Robotics.
 
-You can insert an SD card with raspbian on it, install the RR code, and run it manually.
-Revolution Robotics [publishes instructions](https://revolutionrobotics.org/pages/robot-framework-on-raspbian) on how to do this,
-they are slightly incorrect. Here are the instructions with a few tweaks:
+Because we'd rather not mess with code that already works the ideal thing to do is get another SD card with Raspbian on it, put code on it that can talk to the robot, and put it into the RR's brain. 
+
+Revolution Robotics [publishes instructions](https://revolutionrobotics.org/pages/robot-framework-on-raspbian) on how to do this with their own software, however they are slightly incorrect. Below are the instructions with the one tweak needed to actually make it work:
 
 ```
 1. Download Raspbian and write it onto an SD card
@@ -37,5 +38,9 @@ python3 launch_revvy.py
 6. Make sure that pip3 is working and it’s able to download packages. If you get errors after starting our framework that packages are missing (e.g. pybleno) pip3 couldn’t install the required packages.
 ```
 
-I did this with the SD card in the freenova kit and everything worked but
-the sounds - I have a feeling there may be a raspbian version issue there.
+I did this using the SD card from the freenova kit and everything worked!
+
+# How the Revvy Framework does hardware control
+The Revvy code doesn't talk directly to motors or sensors - it talks to a [hardware controller](https://github.com/RevolutionRobotics/RevvyFramework/tree/master/revvy/mcu). While there are [motor](https://github.com/RevolutionRobotics/RevvyFramework/blob/master/revvy/robot/ports/motors/dc_motor.py) and [sensor](https://github.com/RevolutionRobotics/RevvyFramework/blob/master/revvy/robot/ports/sensors/ev3.py) objects, to instantiate them you must first instantiate an object that represents the hardware controller as well as a 'handler' that talks to the controller.
+
+If you were to clone the RevvyFramework repo and copy it into 
