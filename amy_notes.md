@@ -43,7 +43,7 @@ I did this using the SD card from the freenova kit with rasbian already installe
 ## Leveraging the Revvy Framework for RobotKitLib
 The Revvy code doesn't talk directly to motors or sensors - it talks to a [hardware controller](https://github.com/RevolutionRobotics/RevvyFramework/tree/master/revvy/mcu). While there are [motor](https://github.com/RevolutionRobotics/RevvyFramework/blob/master/revvy/robot/ports/motors/dc_motor.py) and [sensor](https://github.com/RevolutionRobotics/RevvyFramework/blob/master/revvy/robot/ports/sensors/ev3.py) objects, to instantiate them you must first instantiate an object that represents the hardware controller as well as a 'handler' that talks to the controller. Only then can you configure the individual motor and sensor ports.
 
-If you were to clone the [RevvyFramework repo](https://github.com/RevolutionRobotics/RevvyFramework) and copy the "revvy" folder from it into the same directory as your robotkitlib code, below is the code you can use to instantiate a DC motor on "port 1" of the device. I encourage you to mess around in a python console with this code to see if you can get it to move motors:
+If you were to clone the [RevvyFramework repo](https://github.com/RevolutionRobotics/RevvyFramework) and copy the "revvy" folder from it into the same directory as your robotkitlib code, below is the code you can use to instantiate a DC motor on port "M1" of the device. I encourage you to mess around in a python console with this code to see if you can get it to move motors, that's how the below code was generated:
 
 ```
 from revvy.mcu.rrrc_control import RevvyControl
@@ -76,3 +76,5 @@ mc1 = DcMotorController(mh1, Motors.RevvyMotor['config'])
 # Check out the code for more details.
 mc1.set_speed(10)
 ```
+
+Note that if you try to do stuff like this while the revvy framework is actually running (by that I mean you installed the revvy framework as shown above and ran 'launch_revvy.py'), it will error out. Apparently only one person (or code instance) can talk to the hardware controller at a time.
