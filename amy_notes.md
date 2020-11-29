@@ -33,8 +33,6 @@ rm -rf temp
 cd RevvyFramework
 sudo setcap 'cap_net_raw,cap_net_admin+eip' $(readlink -f $(which python3))
 python3 launch_revvy.py
-
-6. Make sure that pip3 is working and it’s able to download packages. If you get errors after starting our framework that packages are missing (e.g. pybleno) pip3 couldn’t install the required packages.
 ```
 
 I followed the above steps using the SD card from the freenova kit with rasbian already installed. I then built the basic Revvy robot, installed the SD card into it, and was able to drive the robot with my phone. What's cool about this is that you can see log messages in the console when you interact with the robot - I found them helpful when trying to figure out how the code works. The one catch is if you reboot or turn off the device, you need to connect to the robot and run "python3 launch_revvy.py" manually. I tried adding this command to /etc/rc.local so that it'd run upon boot, but it didn't work properly - I didn't spend a ton of time getting the framework to launch on boot but I'm sure there's a way.
@@ -43,6 +41,8 @@ I followed the above steps using the SD card from the freenova kit with rasbian 
 The Revvy code doesn't talk directly to motors or sensors - it talks to a [hardware controller](https://github.com/RevolutionRobotics/RevvyFramework/tree/master/revvy/mcu). While there are [motor](https://github.com/RevolutionRobotics/RevvyFramework/blob/master/revvy/robot/ports/motors/dc_motor.py) and [sensor](https://github.com/RevolutionRobotics/RevvyFramework/blob/master/revvy/robot/ports/sensors/ev3.py) objects, to instantiate them you must first instantiate an object that represents the hardware controller as well as a 'handler' that talks to the controller. Only then can you configure the individual motor and sensor ports and communicate with them.
 
 If you were to clone the [RevvyFramework repo](https://github.com/RevolutionRobotics/RevvyFramework) and copy the "revvy" folder from it into the same directory as your robotkitlib code, below is the code you can use to instantiate a DC motor on port "M1" of the device. I encourage you to mess around in a python console before trying to incorporate this into other code.
+
+Note that to use the revvy code you'll still need to follow steps 1-4 in the above "installing the Revvy framework", and you'll also need to do "sudo apt-get install mpg123" if you want to leverage the [sound](https://github.com/RevolutionRobotics/RevvyFramework/blob/6a59a996cb2694385f3ff5e8524bc5f721eeeb48/revvy/hardware_dependent/sound.py#L10) portions of code. 
 
 ```
 from revvy.mcu.rrrc_control import RevvyControl
