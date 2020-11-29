@@ -1,6 +1,7 @@
 ## Hacking the Robot
 The RR robot has a Raspberry Pi under the hood and is running Raspbian. You can take out the SD card, put it on another Pi, and it will boot. However, the default username/password has been changed by Revolution Robotics. Because we'd rather not mess with the SD card that comes with these bots anyway, the ideal thing to do is get another SD card with Raspbian on it, put code on it that can talk to the robot, and put that card into the RR's Pi instead. 
 
+## Revvy Framework Manual Installation
 Revolution Robotics [publishes instructions](https://revolutionrobotics.org/pages/robot-framework-on-raspbian) on how to do this with their own software, however it is slightly incorrect. Below are the instructions with the one tweak needed to actually make it work:
 
 ```
@@ -35,14 +36,16 @@ sudo setcap 'cap_net_raw,cap_net_admin+eip' $(readlink -f $(which python3))
 python3 launch_revvy.py
 ```
 
-I followed the above steps using the SD card from the freenova kit with rasbian already installed. I then built the basic Revvy robot, installed the SD card into it, and was able to drive the robot with my phone. What's cool about this is that you can see log messages in the console when you interact with the robot - I found them helpful when trying to figure out how the code works. The one catch is if you reboot or turn off the device, you need to connect to the robot and run "python3 launch_revvy.py" manually. I tried adding this command to /etc/rc.local so that it'd run upon boot, but it didn't work properly - I didn't spend a ton of time getting the framework to launch on boot but I'm sure there's a way.
+I followed the above steps using the SD card and Pi from a freenova kit. I configured Rasbian to use my home wifi and made sure I could connect to it with SSH. I then built the basic RR "Revvy" robot and put the newly built SD card into the RR brain. Once the RR bot boots up you can SSH into it and run `python3 /home/pi/RevvyFramework/launch_revvy.py`, the LEDs on the RR bot should turn green and you should be able to use it.
 
-## Leveraging the Revvy Framework for RobotKitLib
+What's cool with running the robot this way is that you'll see a bunch of helpful log messages on your SSH console as you drive the robot around - I found them helpful when trying to figure out how the code works. The one thing to note is if you reboot or turn off the device, you need to connect to the robot and run the "launch_revvy.py" command. I tried adding this command to /etc/rc.local so that it'd run upon boot, but it didn't work properly - I didn't spend a ton of time on this - I'm sure there's a way.
+
+## Leveraging the Revvy Framework Hardware Libraries for RobotKitLib
 The Revvy code doesn't talk directly to motors or sensors - it talks to a [hardware controller](https://github.com/RevolutionRobotics/RevvyFramework/tree/master/revvy/mcu). While there are [motor](https://github.com/RevolutionRobotics/RevvyFramework/blob/master/revvy/robot/ports/motors/dc_motor.py) and [sensor](https://github.com/RevolutionRobotics/RevvyFramework/blob/master/revvy/robot/ports/sensors/ev3.py) objects, to instantiate them you must first instantiate an object that represents the hardware controller as well as a 'handler' that talks to the controller. Only then can you configure the individual motor and sensor ports and communicate with them.
 
 If you were to clone the [RevvyFramework repo](https://github.com/RevolutionRobotics/RevvyFramework) and copy the "revvy" folder from it into the same directory as your robotkitlib code, below is the code you can use to instantiate a DC motor on port "M1" of the device. I encourage you to mess around in a python console before trying to incorporate this into other code.
 
-Note that to use the revvy code you'll still need to follow steps 1-4 in the above "installing the Revvy framework", and you'll also need to do "sudo apt-get install mpg123" if you want to leverage the [sound](https://github.com/RevolutionRobotics/RevvyFramework/blob/6a59a996cb2694385f3ff5e8524bc5f721eeeb48/revvy/hardware_dependent/sound.py#L10) portions of code. 
+Note that to use the revvy libraries you'll still need to follow steps 1-4 in the above "Revvy Framework Manual Installation" section, and you'll also need to do "sudo apt-get install mpg123" if you want to leverage the [sound](https://github.com/RevolutionRobotics/RevvyFramework/blob/6a59a996cb2694385f3ff5e8524bc5f721eeeb48/revvy/hardware_dependent/sound.py#L10) portions of code. 
 
 ```
 from revvy.mcu.rrrc_control import RevvyControl
