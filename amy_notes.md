@@ -68,11 +68,11 @@ mh1 = motor_handler._ports[1]
 mh1.configure(Motors.RevvyMotor)
 
 # Finally we can instantiate the controller object that actually talks to this motor.
-# Not sure why but we have to configure this object as well
+# Not sure why, but we have to configure this object as well as the handler
 mc1 = DcMotorController(mh1, Motors.RevvyMotor['config'])
 
-# Now we can set (or get) the speed of the motor (as well as other things),
-# see [the code](https://github.com/RevolutionRobotics/RevvyFramework/blob/master/revvy/robot/ports/motors/dc_motor.py) for reference
+# Now we can set (or get) the speed of the motor (as well as other things) -
+# Check out the DCMotorController object's documentation for details
 mc1.set_speed(10)
 ```
 
