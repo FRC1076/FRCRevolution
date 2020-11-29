@@ -56,7 +56,6 @@ from revvy.robot.configurations import Motors
 from smbus2 import SMBus
 
 # Instantiate controller. 0x2D is defined as constant "ROBOT_I2C_ADDRESS" in the Revvy framework.
-# Talking to SMBus(1) is hardcoded in the framework as well.
 hw_controller = RevvyControl(RevvyTransport(RevvyTransportI2CDevice(0x2D,SMBus(1))))
 
 # instantiate motor handler. There is a similar handler for sensors in revvy.robot.ports.sensor
