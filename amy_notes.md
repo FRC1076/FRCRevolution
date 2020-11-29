@@ -43,7 +43,7 @@ I did this using the SD card from the freenova kit with rasbian already installe
 ## Leveraging the Revvy Framework for RobotKitLib
 The Revvy code doesn't talk directly to motors or sensors - it talks to a [hardware controller](https://github.com/RevolutionRobotics/RevvyFramework/tree/master/revvy/mcu). While there are [motor](https://github.com/RevolutionRobotics/RevvyFramework/blob/master/revvy/robot/ports/motors/dc_motor.py) and [sensor](https://github.com/RevolutionRobotics/RevvyFramework/blob/master/revvy/robot/ports/sensors/ev3.py) objects, to instantiate them you must first instantiate an object that represents the hardware controller as well as a 'handler' that talks to the controller. Only then can you configure the individual motor and sensor ports.
 
-If you were to clone the RevvyFramework repo and copy the "revvy" folder from it into the same directory as your robotkitlib code, below is the code you can use to instantiate a DC motor on "port 1" of the device. I encourage you to mess around in a python console with this code to see if you can get it to move motors:
+If you were to clone the [RevvyFramework repo](https://github.com/RevolutionRobotics/RevvyFramework) and copy the "revvy" folder from it into the same directory as your robotkitlib code, below is the code you can use to instantiate a DC motor on "port 1" of the device. I encourage you to mess around in a python console with this code to see if you can get it to move motors:
 
 ```
 from revvy.mcu.rrrc_control import RevvyControl
