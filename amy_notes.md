@@ -63,16 +63,16 @@ hw_controller = RevvyControl(RevvyTransport(RevvyTransportI2CDevice(0x2D,SMBus(1
 motor_handler = create_motor_port_handler(hw_controller)
 
 # The handler has a _ports attribute that is a dict of ports keyed on their port number (1-6).
-# we can reference a particular port this way. Here it is being configured for the dc_motor:
+# we can reference a particular port this way. A port must be configured for a particular motor
+# type for it to work properly.
 mh1 = motor_handler._ports[1]
 mh1.configure(Motors.RevvyMotor)
 
-# Finally we can instantiate the controller object that actually talks to this motor.
-# Not sure why, but we have to configure this object as well as the handler
+# Now we can instantiate the object that actually controls this motor.
 mc1 = DcMotorController(mh1, Motors.RevvyMotor['config'])
 
-# Now we can set (or get) the speed of the motor (as well as other things) -
-# Check out the DCMotorController object's documentation for details
+# Set the speed of the motor to 10. Check out the DCMotorController object's documentation
+# for other things you can do (set/get speed, power, etc)
 mc1.set_speed(10)
 ```
 
