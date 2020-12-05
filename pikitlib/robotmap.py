@@ -1,0 +1,4 @@
+LEFT = "M1"
+RIGHT = "M4"
+
+DEADZONE = 0.2
