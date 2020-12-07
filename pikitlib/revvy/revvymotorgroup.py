@@ -1,4 +1,4 @@
-from revvy.robot.ports.motors import DcMotorController
+from revvy.robot.ports.motors.dc_motor import DcMotorController
 
 class RevvyMotorGroup():
     '''
@@ -10,8 +10,8 @@ class RevvyMotorGroup():
 
         self.ports = []
         for port in argv:
-            if isinstance(port, DcMotorController)
-                self.items.append(item)
+            if isinstance(port, DcMotorController):
+                self.ports.append(port)
             else:
                 raise TypeError(f'Port group inputs must be of type DcMotorController')
 
@@ -27,5 +27,4 @@ class RevvyMotorGroup():
 
     def set_speed(self, speed):
         self._do('set_speed', inputs=speed)
-
 

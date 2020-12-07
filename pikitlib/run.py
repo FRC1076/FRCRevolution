@@ -1,5 +1,6 @@
 # python run.py robot.py
 
+import random
 
 #General Imports
 import sys
@@ -7,11 +8,9 @@ import time
 import threading
 
 #Robot
-import robot
+import revvy_robot
 import pikitlib
 from networktables import NetworkTables
-
-
 
 #Networking and Logging
 import logging
@@ -22,19 +21,15 @@ logging.basicConfig(level=logging.DEBUG)
 
 
 class main():
-    def __init__(self, robot=robot.MyRobot()):
+    def __init__(self):
         """
         Construct robot disconnect, and powered on
         """
-        self.r = robot
+        self.r = revvy_robot.RevvyRobot()
         self.current_mode = ""
         self.disabled = True
-        
 
         self.timer = pikitlib.Timer()
-
-        
-
         
     def connect(self):
         """
@@ -48,16 +43,16 @@ class main():
         """
         Setup the listener to detect any changes to the robotmode table
         """
-        #print(info, "; Connected=%s" % connected)
+        print(info, "; Connected=%s" % connected)
         logging.info("%s; Connected=%s", info, connected)
         sd = NetworkTables.getTable("RobotMode")
         sd.addEntryListener(self.valueChanged)
-   
+
     def valueChanged(self, table, key, value, isNew):
         """
         Check for new changes and use them
         """
-        #print("valueChanged: key: '%s'; value: %s; isNew: %s" % (key, value, isNew))
+        print("valueChanged: key: '%s'; value: %s; isNew: %s" % (key, value, isNew))
         if(key == "Mode"):
             self.setupMode(value)
         if(key == "Disabled"):
@@ -75,13 +70,19 @@ class main():
         
     def start(self):    
         self.r.robotInit()
-        #self.setupBatteryLogger()
-        #self.rl = threading.Thread(target=self.robotLoop)
+        print("robot initialized")
+        self.setupBatteryLogger()
+        print("battery logger setup")
         self.stop_threads = False
         self.rl = threading.Thread(target = self.robotLoop, args =(lambda : self.stop_threads, )) 
         self.rl.start() 
+        print("started r1 thread")
         if self.rl.is_alive():
+            print("Main thread created")
             logging.debug("Main thread created")
+
+    def broadcastNoCode(self):
+        self.status_nt.putBoolean("Code", False)
 
 
     def setupMode(self, m):
@@ -96,7 +97,7 @@ class main():
 
         self.current_mode = m
        
-        #self.rl.start()
+        self.rl.start()
 
     def auton(self):
         self.r.autonomousPeriodic()
@@ -104,28 +105,22 @@ class main():
     def teleop(self):
         self.r.teleopPeriodic()
         
-#    def disable(self):
-#        m1 = pikitlib.SpeedController(1)
-#        m2 = pikitlib.SpeedController(2)
-#        m3 = pikitlib.SpeedController(3)
-#        m4 = pikitlib.SpeedController(4)
-#        m = pikitlib.SpeedControllerGroup(m1,m2,m3,m4)
-#        m.set(0)
+    def disable(self):
+        self.r.disable()
 
-#    def setupBatteryLogger(self):
-#        self.battery_nt = NetworkTables.getTable('Battery')
-#        self.ai = pikitlib.analogInput(2)
-       
+    # TODO: Implement battery read class
+    def setupBatteryLogger(self):
+        self.battery_nt = NetworkTables.getTable('Battery') 
 
-#    def sendBatteryData(self):
-#        self.battery_nt.putNumber("Voltage", self.ai.getVoltage() * 3)
+    def sendBatteryData(self):
+        self.battery_nt.putNumber("Voltage", random.random())
 
             
     def quit(self):
         logging.info("Quitting...")
         self.stop_threads = True
         self.rl.join() 
-#        self.disable()
+        self.disable()
         sys.exit()
             
     def robotLoop(self, stop):
@@ -134,7 +129,8 @@ class main():
         while not stop():
             
             if bT.get() > 0.2:
-#                self.sendBatteryData()
+                print("sending battery data")
+                self.sendBatteryData()
                 bT.reset()
 
             if not self.disabled:
@@ -174,10 +170,14 @@ class main():
 
 
 if __name__ == "__main__":
-    
+   
+    print("calling main")
     m = main()
+    print("calling connect")
     m.connect()
+    print("calling start")
     m.start()
+    print("robot started")
     
 
     

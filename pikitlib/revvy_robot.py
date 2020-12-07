@@ -1,6 +1,7 @@
-import pikitlib
-from pikitlib.revvycontroller import RevvyMotorController, MOTOR_PORTS, SENSOR_PORTS
-from pikitlib.revvydrive import RevvyDrive
+from pikitlib import XboxController
+from revvy.revvycontroller import RevvyMotorController, MOTOR_PORTS, SENSOR_PORTS
+from revvy.revvymotorgroup import RevvyMotorGroup
+from revvy.revvydrive import RevvyDrive
 
 import time
 from networktables import NetworkTables
@@ -20,8 +21,8 @@ class RevvyRobot():
         and stores them as lists
         """
 
-        self.motor_ports = [x for x in robotmap.__dict__ if x in MOTOR_PORTS ]
-        self.sensor_ports = [x for x in robotmap.__dict__ if x in SENSOR_PORTS ]
+        self.motor_ports = [x for x in robotmap.__dict__.values() if x in MOTOR_PORTS ]
+        self.sensor_ports = [x for x in robotmap.__dict__.values() if x in SENSOR_PORTS ]
 
 
     def robotInit(self):
@@ -29,18 +30,23 @@ class RevvyRobot():
         # object that handles basic drive operations
 
         # generate lists of sensor and motor ports from robotmap
-        _get_revvy_ports(robotmap)
+        self._get_revvy_ports(robotmap)
 
         # instantiate motors (tbd: sensors)
-        self.motors = RevvyMotorContoller(self.motor_ports)
+        print(f"Motor ports {self.motor_ports}")
+        self.motors = RevvyMotorController(self.motor_ports)
 
-        self.leftMotors = RevvyMotorGroup([self.motors[robotmap.LEFT]])
-        self.rightMotors = RevvyMotorGroup(self.motors[robotmap.RIGHT]
+        self.left = RevvyMotorGroup(self.motors.ports[robotmap.LEFT])
+        self.right = RevvyMotorGroup(self.motors.ports[robotmap.RIGHT])
 
+        print("Done with motor groups")
         NetworkTables.initialize()
-        self.driver = pikitlib.XboxController(0)
+        print("initialized network tables")
+        self.driver = XboxController(0)
+        print("done w xbox controller")
 
         self.myRobot = RevvyDrive(self.left, self.right)
+        print("done with robot init")
 
     def autonomousInit(self):
         self.myRobot.tankDrive(0.8, 0.8)
@@ -60,8 +66,12 @@ class RevvyRobot():
         return val
 
     def teleopPeriodic(self):
-        
+       
         forward = self.driver.getY(LEFT_HAND)
         rotation_value = self.driver.getX(RIGHT_HAND)
         self.myRobot.arcadeDrive(forward, rotation_value)
 
+    def disable(self):
+        
+        if(self.motors):
+            self.motors.disable()

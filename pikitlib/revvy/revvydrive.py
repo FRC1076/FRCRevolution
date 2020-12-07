@@ -1,11 +1,11 @@
-from revvy.robot.ports.motors.dc_motor import DcMotorController
+from revvy.revvymotorgroup import RevvyMotorGroup
 
 # It looks like the valid Revvy DC motor speed values are -150 to 150.
 SPEED_MULTIPLIER = 150
 
 class RevvyDrive:
 
-    def __init__(self, left: RevvyGroup, right: RevvyGroup):
+    def __init__(self, left: RevvyMotorGroup, right: RevvyMotorGroup):
         self.left = left
         self.right = right
 
