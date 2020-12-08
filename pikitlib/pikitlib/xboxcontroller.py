@@ -36,12 +36,14 @@ class XboxController():
         #Linux Xbox Controller Values:
         # A, B, X, Y, L bumpter, R bumber, back, start, big shinny button
         # LHand Y, LHand X, L trigger, RHand X, RHand Y, R trigger
-        
+
         self.buttons = self.nt.getBooleanArray("Buttons", [False])
         self.axis_values = self.nt.getNumberArray("Axis", [0])
+        print(f"init: setting axis value {self.axis_values}")
         while self.axis_values == [0]:
             time.sleep(0.02)
             self.axis_values = list(self.nt.getNumberArray("Axis", [0]))
+            print(f"initloop: setting axis value {self.axis_values}")
 
 
     def getRawButton(self, v) -> bool:
