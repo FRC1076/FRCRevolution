@@ -70,13 +70,10 @@ class main():
         
     def start(self):    
         self.r.robotInit()
-        print("robot initialized")
         self.setupBatteryLogger()
-        print("battery logger setup")
         self.stop_threads = False
         self.rl = threading.Thread(target = self.robotLoop, args =(lambda : self.stop_threads, )) 
         self.rl.start() 
-        print("started r1 thread")
         if self.rl.is_alive():
             print("Main thread created")
             logging.debug("Main thread created")
@@ -115,7 +112,9 @@ class main():
     def sendBatteryData(self):
         self.battery_nt.putNumber("Voltage", random.random())
 
-            
+    def getDriverstationData(self):
+        self.battery_nt.getNumber("Driver",-1)
+
     def quit(self):
         logging.info("Quitting...")
         self.stop_threads = True
@@ -126,11 +125,18 @@ class main():
     def robotLoop(self, stop):
         bT = pikitlib.Timer() 
         bT.start()
+        driver = 0
         while not stop():
             
             if bT.get() > 0.2:
-                print("sending battery data")
                 self.sendBatteryData()
+                new_driver = self.getDriverstationData()
+                if new_driver != driver:
+                    driver = new_driver
+                else:
+                    logging.critical("Lost connection with driverstation!")
+                    m.disable()
+
                 bT.reset()
 
             if not self.disabled:
@@ -171,13 +177,12 @@ class main():
 
 if __name__ == "__main__":
    
-    print("calling main")
     m = main()
-    print("calling connect")
-    m.connect()
-    print("calling start")
-    m.start()
-    print("robot started")
-    
+    try:
+        m.connect()
+        m.start()
+    except Exception as e:
+        m.disable()
+        raise(e)
 
     
