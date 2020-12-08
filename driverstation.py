@@ -1,7 +1,8 @@
-
 #Pygame Imports
 import sys, time    #Imports Modules
 import pygame
+
+
 
 #Robot kit imports
 from networktables import NetworkTables
@@ -12,6 +13,7 @@ import ctypes
 import logging
 
 import argparse
+import random
 
 import driverstationgui
 
@@ -55,7 +57,6 @@ def valueChanged(table, key, value, isNew):
         bV = str(value)[:4]
         GUI.setBatInfoText(bV)
 
-        #print("Voltage: " + str(value))
         
 
 # Construct an argument parser
@@ -104,7 +105,7 @@ tryToSetupJoystick()
 # save reference to table for each xbox controller
 xbc_nt = NetworkTables.getTable('DriverStation/XboxController0')
 mode_nt = NetworkTables.getTable('RobotMode')
-
+battery_nt = NetworkTables.getTable('Battery')
 
 #lg = threading.Thread(target=logreceiver.main)
 #lg.daemon = True
@@ -126,7 +127,6 @@ while loopQuit == False:
     """
     TODO: Check if values are different for windows/linux
     TODO: Update only when there is an update event
-
     Look at the documentation for NetworkTables for some ideas.
          https://robotpy.readthedocs.io/projects/pynetworktables/en/latest/examples.html
     """
@@ -192,6 +192,8 @@ while loopQuit == False:
     if hasCommunication:
         mode_nt.putBoolean("Disabled", disabled)
         mode_nt.putString("Mode", mode)
+    
+    #battery_nt.putNumber("Driver",random.random())
 
     GUI.update()
 
