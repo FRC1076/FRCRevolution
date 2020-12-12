@@ -7,14 +7,14 @@ import time
 from networktables import NetworkTables
 # To see messages from networktables, you must setup logging
 import logging
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.ERROR)
 
 import robotmap
 
 LEFT_HAND = 1
 RIGHT_HAND = 0
 
-class RevvyRobot():
+class MyRobot():
     def _get_revvy_ports(self, robotmap):
         """
         pulls the revvy motor and sensor ports out of robotmap

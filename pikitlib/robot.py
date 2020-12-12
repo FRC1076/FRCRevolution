@@ -1,36 +1,52 @@
-import pikitlib
+from pikitlib import XboxController
+from revvy.revvycontroller import RevvyMotorController, MOTOR_PORTS, SENSOR_PORTS
+from revvy.revvymotorgroup import RevvyMotorGroup
+from revvy.revvydrive import RevvyDrive
+
 import time
 from networktables import NetworkTables
 # To see messages from networktables, you must setup logging
 import logging
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.ERROR)
 
 import robotmap
 
 LEFT_HAND = 1
 RIGHT_HAND = 0
 
-class MyRobot():
+class RevvyRobot():
+    def _get_revvy_ports(self, robotmap):
+        """
+        pulls the revvy motor and sensor ports out of robotmap
+        and stores them as lists
+        """
+
+        self.motor_ports = [x for x in robotmap.__dict__.values() if x in MOTOR_PORTS ]
+        self.sensor_ports = [x for x in robotmap.__dict__.values() if x in SENSOR_PORTS ]
+
+
     def robotInit(self):
         """Robot initialization function"""
         # object that handles basic drive operations
-        self.leftBackMotor = pikitlib.SpeedController(robotmap.BACK_LEFT)
-        self.leftFrontMotor = pikitlib.SpeedController(robotmap.FRONT_LEFT)
-        self.rightBackMotor = pikitlib.SpeedController(robotmap.BACK_RIGHT)
-        self.rightFrontMotor = pikitlib.SpeedController(robotmap.FRONT_RIGHT)
 
-        self.left = pikitlib.SpeedControllerGroup(self.leftBackMotor, self.leftFrontMotor)
-        self.right = pikitlib.SpeedControllerGroup(self.rightBackMotor, self.rightFrontMotor )
+        # generate lists of sensor and motor ports from robotmap
+        self._get_revvy_ports(robotmap)
 
-        self.myRobot = pikitlib.DifferentialDrive(self.left, self.right)
-       # self.myRobot.setExpiration(0.1)
+        # instantiate motors (tbd: sensors)
+        print(f"Motor ports {self.motor_ports}")
+        self.motors = RevvyMotorController(self.motor_ports)
 
-        self.DEADZONE = 0.4
+        self.left = RevvyMotorGroup(self.motors.ports[robotmap.LEFT])
+        self.right = RevvyMotorGroup(self.motors.ports[robotmap.RIGHT])
 
-        #self.buzz = pikitlib.IllegalBuzzer()
-
+        print("Done with motor groups")
         NetworkTables.initialize()
-        self.driver = pikitlib.XboxController(0)
+        print("initialized network tables")
+        self.driver = XboxController(0)
+        print("done w xbox controller")
+
+        self.myRobot = RevvyDrive(self.left, self.right)
+        print("done with robot init")
 
     def autonomousInit(self):
         self.myRobot.tankDrive(0.8, 0.8)
@@ -42,8 +58,7 @@ class MyRobot():
         """
         Configures appropriate robot settings for teleop mode
         """
-        self.left.setInverted(False)
-        self.right.setInverted(False)
+        pass
         
     def deadzone(self, val, deadzone):
         if abs(val) < deadzone:
@@ -51,9 +66,12 @@ class MyRobot():
         return val
 
     def teleopPeriodic(self):
-        
-        forward = self.driver.getX(LEFT_HAND)
-        forward = 0.80 * self.deadzone(forward, robotmap.DEADZONE)
-        rotation_value = -0.8 * self.driver.getY(RIGHT_HAND)
-        self.myRobot.arcadeDrive(forward,rotation_value)
+       
+        forward = self.driver.getY(LEFT_HAND)
+        rotation_value = self.driver.getX(RIGHT_HAND)
+        self.myRobot.arcadeDrive(forward, rotation_value)
 
+    def disable(self):
+        
+        if(self.motors):
+            self.motors.disable()

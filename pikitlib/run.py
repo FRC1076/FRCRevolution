@@ -1,16 +1,21 @@
 # python run.py robot.py
 
-import random
 
 #General Imports
 import sys
 import time
 import threading
+import random
 
 #Robot
-import revvy_robot
+#import robot
 import pikitlib
 from networktables import NetworkTables
+
+import socket
+import os
+
+import buffer
 
 #Networking and Logging
 import logging
@@ -25,11 +30,26 @@ class main():
         """
         Construct robot disconnect, and powered on
         """
-        self.r = revvy_robot.RevvyRobot()
+        self.r = None
         self.current_mode = ""
         self.disabled = True
-
+        
+        
         self.timer = pikitlib.Timer()
+
+        self.isRunning = False
+
+        
+    def tryToSetupCode(self):
+        try:
+            import RobotCode.robot
+            self.r = RobotCode.robot.MyRobot()
+            
+            return True
+        except ModuleNotFoundError as e:
+            print(f"not found {e}")
+            return False
+        
         
     def connect(self):
         """
@@ -43,16 +63,20 @@ class main():
         """
         Setup the listener to detect any changes to the robotmode table
         """
-        print(info, "; Connected=%s" % connected)
+        #print(info, "; Connected=%s" % connected)
+        
         logging.info("%s; Connected=%s", info, connected)
+        #self.cr = codeReceiver("0.0.0.0", 5001)
+        #self.cr.setupConnection()
         sd = NetworkTables.getTable("RobotMode")
+        self.status_nt = NetworkTables.getTable("Status")
         sd.addEntryListener(self.valueChanged)
-
+   
     def valueChanged(self, table, key, value, isNew):
         """
         Check for new changes and use them
         """
-        print("valueChanged: key: '%s'; value: %s; isNew: %s" % (key, value, isNew))
+        #print("valueChanged: key: '%s'; value: %s; isNew: %s" % (key, value, isNew))
         if(key == "Mode"):
             self.setupMode(value)
         if(key == "Disabled"):
@@ -68,16 +92,20 @@ class main():
         
         rootLogger.addHandler(socketHandler)
         
-    def start(self):    
+    def start(self):
+        self.isRunning = True
         self.r.robotInit()
         self.setupBatteryLogger()
+        self.status_nt.putBoolean("Code", True)
+        #self.rl = threading.Thread(target=self.robotLoop)
         self.stop_threads = False
-        self.rl = threading.Thread(target = self.robotLoop, args =(lambda : self.stop_threads, )) 
+        self.rl = threading.Thread(target = self.robotLoop, args =(lambda : self.stop_threads, ))
         self.rl.start() 
+        print("created")
         if self.rl.is_alive():
-            print("Main thread created")
             logging.debug("Main thread created")
 
+    
     def broadcastNoCode(self):
         self.status_nt.putBoolean("Code", False)
 
@@ -93,8 +121,6 @@ class main():
             self.r.autonomousInit()
 
         self.current_mode = m
-       
-        self.rl.start()
 
     def auton(self):
         self.r.autonomousPeriodic()
@@ -105,16 +131,13 @@ class main():
     def disable(self):
         self.r.disable()
 
-    # TODO: Implement battery read class
     def setupBatteryLogger(self):
-        self.battery_nt = NetworkTables.getTable('Battery') 
+        self.battery_nt = NetworkTables.getTable('Battery')
+       
 
     def sendBatteryData(self):
         self.battery_nt.putNumber("Voltage", random.random())
-
-    def getDriverstationData(self):
-        self.battery_nt.getNumber("Driver",-1)
-
+            
     def quit(self):
         logging.info("Quitting...")
         self.stop_threads = True
@@ -125,18 +148,10 @@ class main():
     def robotLoop(self, stop):
         bT = pikitlib.Timer() 
         bT.start()
-        driver = 0
         while not stop():
             
             if bT.get() > 0.2:
                 self.sendBatteryData()
-                new_driver = self.getDriverstationData()
-                if new_driver != driver:
-                    driver = new_driver
-                else:
-                    logging.critical("Lost connection with driverstation!")
-                    m.disable()
-
                 bT.reset()
 
             if not self.disabled:
@@ -166,7 +181,6 @@ class main():
         self.disabled = False
         self.start()
         self.setupMode("Teleop")
-        #self.mainLoopThread()
 
     
             
@@ -175,14 +189,20 @@ class main():
 
 
 
-if __name__ == "__main__":
-   
-    m = main()
-    try:
-        m.connect()
-        m.start()
-    except Exception as e:
-        m.disable()
-        raise(e)
 
     
+m = main()
+m.connect()
+
+if m.tryToSetupCode():
+    m.start()
+else:
+    time.sleep(0.2)
+    try:
+        m.broadcastNoCode()
+    except Exception as e:
+        print("Either no code or error in robot code")
+        print("Waiting...")
+        print(e)
+    sys.exit(1)
+
