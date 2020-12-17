@@ -1,7 +1,22 @@
-from pikitlib import XboxController
-from revvy.revvycontroller import RevvyMotorController, MOTOR_PORTS, SENSOR_PORTS
+import pikitlib
+
+#### a gazillion imports from Revvy ###
+
+# these are classes unaltered from the revvy code
+from revvy.mcu.commands import BatteryStatus
+from revvy.mcu.rrrc_control import RevvyTransportBase
+from revvy.robot.imu import IMU
+from revvy.robot.led_ring import RingLed
+from revvy.robot.ports.motor import create_motor_port_handler
+from revvy.robot.ports.sensor import create_sensor_port_handler
+from revvy.robot.sound import Sound
+
+# these are custom wrappers around the code that allow
+# us to interact w/the object in a FRC-style way
+from revvy.revvydcmotor import getRevvyMotor
 from revvy.revvymotorgroup import RevvyMotorGroup
-from revvy.revvydrive import RevvyDrive
+
+from smbus2 import SMBus
 
 import time
 from networktables import NetworkTables
@@ -15,35 +30,37 @@ LEFT_HAND = 1
 RIGHT_HAND = 0
 
 class RevvyRobot():
-    def _get_revvy_ports(self, robotmap):
-        """
-        pulls the revvy motor and sensor ports out of robotmap
-        and stores them as lists
-        """
 
-        self.motor_ports = [x for x in robotmap.__dict__.values() if x in MOTOR_PORTS ]
-        self.sensor_ports = [x for x in robotmap.__dict__.values() if x in SENSOR_PORTS ]
 
 
     def robotInit(self):
         """Robot initialization function"""
         # object that handles basic drive operations
 
-        # generate lists of sensor and motor ports from robotmap
-        self._get_revvy_ports(robotmap)
+        ### Stolen from RevvyFramework's robot.py, don't edit this section ###
+        self._comm_interface = RevvyTransportI2C(1)
+        self._robot_control = self._comm_interface.create_application_control()
+        self._ring_led = RingLed(self._robot_control)
+        #self._sound = TBD
 
-        # instantiate motors (tbd: sensors)
-        print(f"Motor ports {self.motor_ports}")
-        self.motors = RevvyMotorController(self.motor_ports)
+        self._status = RobotStatusIndicator(self._robot_control)
+        self._status_updater = McuStatusUpdater(self._robot_control)
+        self._battery = BatteryStatus(0, 0, 0)
+        self._imu = IMU()
+    
+        self._motor_ports = create_motor_port_handler(self._robot_control)
+        self._sensor_ports = create_sensor_port_handler(self._robot_control)
+        ##########
 
-        self.left = RevvyMotorGroup(self.motors.ports[robotmap.LEFT])
-        self.right = RevvyMotorGroup(self.motors.ports[robotmap.RIGHT])
+        # define left and right motors
+        self.left_motor = getRevvyMotor(self._motor_ports, robotmap.LEFT)
+        self.right_motor = getRevvyMotor(self._motor_ports, robotmap.RIGHT)
 
-        print("Done with motor groups")
+        self.left = RevvyMotorGroup(self.left_motor)
+        self.right = RevvyMotorGroup(self.right_motor)
+
         NetworkTables.initialize()
-        print("initialized network tables")
-        self.driver = XboxController(0)
-        print("done w xbox controller")
+        self.driver = pikitlib.XboxController(0)
 
         self.myRobot = RevvyDrive(self.left, self.right)
         print("done with robot init")
@@ -68,10 +85,15 @@ class RevvyRobot():
     def teleopPeriodic(self):
        
         forward = self.driver.getY(LEFT_HAND)
+        forward = self.deadzone(forward, robotmap.DEADZONE)
         rotation_value = self.driver.getX(RIGHT_HAND)
         self.myRobot.arcadeDrive(forward, rotation_value)
 
     def disable(self):
-        
-        if(self.motors):
-            self.motors.disable()
+        if getattr(self,'_motor_ports'):
+            for i in self._motor_ports._ports.values():
+                if i._driver:
+                    i._driver.set_speed(0)
+
+if __name__ == "__main__":
+    pikitlib.run(MyRobot)
