@@ -22,40 +22,6 @@ def quit():
     pygame.quit()
     sys.exit()
 
-"""
-def connect():
-
-        #Connect to robot NetworkTables server
-
-        #NetworkTables.initialize(server=ip)
-        NetworkTables.addConnectionListener(connectionListener, immediateNotify=True)
-
-
-def connectionListener(connected, info):
-
-
-    #print(info, "; Connected=%s" % connected)
-    logging.info("%s; Connected=%s", info, connected)
-    global hasCommunication
-    hasCommunication = True
-
-    global s
-    s = socket.socket()
-
-    
-    sd = NetworkTables.getTable("Battery")
-    sd.addEntryListener(valueChanged)
-
-def valueChanged(table, key, value, isNew):
-
-    #Check for new changes and use them
-
-
-    if(key == "Voltage"):
-        bV = str(value)[:4]
-        GUI.setBatInfoText(bV)
-
-"""   
 
 # Construct an argument parser
 parser = argparse.ArgumentParser()
@@ -109,9 +75,9 @@ mode_nt = NetworkTables.getTable('RobotMode')
 status_nt = NetworkTables.getTable('Status')
 batval_nt = NetworkTables.getTable('Battery')
 tryToSetupJoystick()
-#lg = threading.Thread(target=logreceiver.main)
-#lg.daemon = True
-#lg.start()
+lg = threading.Thread(target=logreceiver.main)
+lg.daemon = True
+lg.start()
 
 
 mode = ""
@@ -153,7 +119,7 @@ while loopQuit == False:
         xbc_nt.putNumberArray("Axis", list(axis_values))
 
     
-    hasCommunication = True if NetworkTables.getRemoteAddress() is not None else False
+    hasCommunication = NetworkTables.getRemoteAddress() is not None
     
 
 

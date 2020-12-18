@@ -29,9 +29,7 @@ import robotmap
 LEFT_HAND = 1
 RIGHT_HAND = 0
 
-class RevvyRobot():
-
-
+class MyRobot():
 
     def robotInit(self):
         """Robot initialization function"""
@@ -88,12 +86,6 @@ class RevvyRobot():
         forward = self.deadzone(forward, robotmap.DEADZONE)
         rotation_value = self.driver.getX(RIGHT_HAND)
         self.myRobot.arcadeDrive(forward, rotation_value)
-
-    def disable(self):
-        if getattr(self,'_motor_ports'):
-            for i in self._motor_ports._ports.values():
-                if i._driver:
-                    i._driver.set_speed(0)
 
 if __name__ == "__main__":
     pikitlib.run(MyRobot)

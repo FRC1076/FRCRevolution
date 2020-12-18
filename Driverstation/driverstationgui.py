@@ -1,5 +1,5 @@
 import pygame, sys, time    #Imports Modules
-
+# pylint: disable=no-member
 
 class RectItem():
     def __init__(self, color, x,y,width,height,  text='', fontSize=40, outline=None):
@@ -108,6 +108,7 @@ class DriverstationGUI():
         self.practiceButton  = Button(self.G,   50,130, 210,  30, "Practice (TODO)", 30, ["Mode", "Practice"])
         self.testButton      = Button(self.G,   50,170, 210,  30, "Test     (TODO)", 30, ["Mode", "Test"])
         #self.eStopButton     = Button(self.G,  270,220, 100,  90, "EStop",  rValue=["ESTOP", True])
+        self.sendCodeButton  = Button(self.G,  270,220, 100,  90, "Send Code", 30, ["Code", True])
         self.commText        = RectItem(self.W,380,110, 100,  20, "Communication", 20, outline=1) #Is the robot connected?
         self.robotCodeText   = RectItem(self.W,380,130, 100,  20, "Robot Code", 20, outline=1)  #Is there code on the robot? (TODO)
         self.joystickText    = RectItem(self.W,380,150, 100,  20, "Joysticks", 20, outline=1) 
@@ -122,9 +123,10 @@ class DriverstationGUI():
         self.control_buttons = [self.testButton,self.practiceButton,
                                 self.autonButton,self.teleopButton]
         self.enable_buttons = [self.enableButton,self.disableButton]
-        self.pygame_buttons  = self.enable_buttons + self.control_buttons
-        self.exclusive_buttons = [self.enable_buttons, self.control_buttons]
         
+        self.exclusive_buttons = [self.enable_buttons, self.control_buttons]
+        #self.regular_buttons = [self.sendCodeButton]
+        self.pygame_buttons  = self.enable_buttons + self.control_buttons
         self.texts = [self.descriptionText, self.batteryVal, self.batteryText, self.commText,
                       self.robotCodeText, self.joystickText, self.joyIndicator, self.codeIndicator,
                       self.commIndicator]
@@ -179,6 +181,9 @@ class DriverstationGUI():
                                 jbtn.unselect()
                             btn.select()
                             return btn.returnValue()
+                #for btn in self.regular_buttons:
+                #    if btn.isOver(pos):
+                #        return btn.returnValue()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     return {"action":"Quit", "value":True}
