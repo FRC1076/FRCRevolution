@@ -3,18 +3,18 @@
 # robot.py.
 
 
-from .revvy.robot.status_updater import McuStatusUpdater
-from .revvy.mcu.commands import BatteryStatus
-from .revvy.mcu.rrrc_control import RevvyTransportBase
-from .revvy.robot.imu import IMU
-from .revvy.robot.led_ring import RingLed
-from .revvy.robot.ports.motor import create_motor_port_handler
-from .revvy.robot.ports.sensor import create_sensor_port_handler
-from .revvy.robot.sound import Sound
-from .revvy.hardware_dependent.rrrc_transport_i2c import RevvyTransportI2C
+from revvy.robot.status_updater import McuStatusUpdater
+from revvy.mcu.commands import BatteryStatus
+from revvy.mcu.rrrc_control import RevvyTransportBase
+from revvy.robot.imu import IMU
+from revvy.robot.led_ring import RingLed
+from revvy.robot.ports.motor import create_motor_port_handler
+from revvy.robot.ports.sensor import create_sensor_port_handler
+from revvy.robot.sound import Sound
+from revvy.hardware_dependent.rrrc_transport_i2c import RevvyTransportI2C
 
-from .revvy.robot.ports.motors.dc_motor import DcMotorController
-from .revvy.robot.configurations import Motors
+from revvy.robot.ports.motors.dc_motor import DcMotorController
+from revvy.robot.configurations import Motors
 
 MOTOR_PORTS = ['M1', 'M2', 'M3', 'M4', 'M5', 'M6']
 
@@ -27,8 +27,8 @@ class RevBot():
         self._ring_led = RingLed(self._robot_control)
         #self._sound = TBD
 
-        self._status = RobotStatusIndicator(self._robot_control)
-        self._status_updater = McuStatusUpdater(self._robot_control)
+        #self._status = RobotStatusIndicator(self._robot_control)
+        #self._status_updater = McuStatusUpdater(self._robot_control)
         self._battery = BatteryStatus(0, 0, 0)
         self._imu = IMU()
    
@@ -42,7 +42,6 @@ class RevBot():
         Configures a revvy motor port and returns a DC motor
         controller object.
 
-        :mh: Revvy motor handler object
         :port: The port the motor is on (eg "M3")
         '''
 
@@ -50,12 +49,17 @@ class RevBot():
         if port not in MOTOR_PORTS:
             raise ValueError(f"Port {port} must be in {MOTOR_PORTS}")
 
-        port_instance = mh._ports[int(p.lstrip('M'))]
+        port_instance = self._motor_ports._ports[int(port.lstrip('M'))]
         port_instance.configure(Motors.RevvyMotor)
 
         return DcMotorController(port_instance, Motors.RevvyMotor['config'])
 
+    @property
+    def led(self):
+        return self._ring_led
 
-    def disable():
-        pass
+    def disable(self):
+        for m in self._motor_ports:
+            if(m._driver):
+                m._driver.set_speed(0)
 
