@@ -2,18 +2,19 @@
 # and instantiates important objects you can use in your
 # robot.py.
 
-from revvy.robot.status_updater import McuStatusUpdater
-from revvy.mcu.commands import BatteryStatus
-from revvy.mcu.rrrc_control import RevvyTransportBase
-from revvy.robot.imu import IMU
-from revvy.robot.led_ring import RingLed
-from revvy.robot.ports.motor import create_motor_port_handler
-from revvy.robot.ports.sensor import create_sensor_port_handler
-from revvy.robot.sound import Sound
-from revvy.hardware_dependent.rrrc_transport_i2c import RevvyTransportI2C
 
-from revvy.robot.ports.motors.dc_motor import DcMotorController
-from revvy.robot.configurations import Motors
+from .revvy.robot.status_updater import McuStatusUpdater
+from .revvy.mcu.commands import BatteryStatus
+from .revvy.mcu.rrrc_control import RevvyTransportBase
+from .revvy.robot.imu import IMU
+from .revvy.robot.led_ring import RingLed
+from .revvy.robot.ports.motor import create_motor_port_handler
+from .revvy.robot.ports.sensor import create_sensor_port_handler
+from .revvy.robot.sound import Sound
+from .revvy.hardware_dependent.rrrc_transport_i2c import RevvyTransportI2C
+
+from .revvy.robot.ports.motors.dc_motor import DcMotorController
+from .revvy.robot.configurations import Motors
 
 MOTOR_PORTS = ['M1', 'M2', 'M3', 'M4', 'M5', 'M6']
 

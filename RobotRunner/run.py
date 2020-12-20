@@ -19,7 +19,6 @@ import buffer
 #Robot
 #import robot
 import pikitlib
-import revlib
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -41,13 +40,18 @@ class main():
         
     def tryToSetupCode(self):
         try:
-            from .RobotCode.robot import MyRobot
+            # Allows absolute references to work when they're
+            # copied over.
+            dir = os.path.dirname(os.path.realpath(__file__))
+            sys.path.append(f'{dir}/RobotCode')
+            from RobotCode.robot import MyRobot
             self.r = MyRobot()
             
             return True
         except Exception as e:
             logging.critical("Looks like you dont have any code!")
             logging.critical("Send code with deploy.py")
+            print(f"ERROR: {e}")
             self.catchErrorAndLog(e, False)
             return False
         
