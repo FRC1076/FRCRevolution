@@ -71,7 +71,7 @@ while True:
     if file_name: #If we received a new file
         os.system("rm -R RobotCode/")
         os.mkdir("RobotCode")
-        os.system("tar -xf " + file_name)
+        os.system(f"tar -xf {file_name} -C RobotCode")
         os.system("rm " + file_name)
         process.kill()
         process = subprocess.Popen(["python", path], shell=False)
