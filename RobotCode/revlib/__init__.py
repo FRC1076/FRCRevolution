@@ -5,4 +5,7 @@ dir = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(f'{dir}')
 
 from .revbot import RevBot
-# SPDX-License-Identifier: GPL-3.0-only
+from .motor_group import MotorGroup
+from .drive import Drive
+from .motor import get_motor
+from .sensor import get_bumper, get_ultra

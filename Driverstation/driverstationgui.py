@@ -99,7 +99,7 @@ class DriverstationGUI():
         
         # pygame setup                      lX  lY  sX   sY
         self.descriptionText = RectItem(self.G,  0,  0, 600,  40, "PiKitLib Driverstation", 50)
-        self.batteryText     = RectItem(self.G,380, 50, 100,  30, "Voltage:", 20)
+        self.batteryText     = RectItem(self.G,380, 50, 100,  30, "Battery Percent:", 20)
         self.batteryVal      = RectItem(self.G,380, 70, 100,  50, "NO DATA", 30)
         self.enableButton    = Button(self.G,   50,220, 100,  90, "Enable",  rValue=["Enable", True])
         self.disableButton   = Button(self.G,  160,220, 100,  90, "Disable", rValue=["Enable", False])
