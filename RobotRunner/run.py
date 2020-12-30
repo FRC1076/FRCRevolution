@@ -1,5 +1,6 @@
 # python run.py robot.py
 
+import traceback
 
 #Networking and Logging
 import logging
@@ -20,7 +21,7 @@ import buffer
 #import robot
 import pikitlib
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.ERROR)
 
 
 class main():
@@ -51,7 +52,7 @@ class main():
         except Exception as e:
             logging.critical("Looks like you dont have any code!")
             logging.critical("Send code with deploy.py")
-            print(f"ERROR: {e}")
+            logging.critical(f"ERROR: {e}")
             self.catchErrorAndLog(e, False)
             return False
         
@@ -133,8 +134,12 @@ class main():
         self.r.teleopPeriodic()
         
     def disable(self):
-        # Todo: remove 'disable' from robot.py and into revlib
-        self.r.disable()
+        if not self.r.disabled:
+            self.r.disable()
+
+    def enable(self):
+        if self.r.disabled:
+            self.r.enable()
 
     def setupBatteryLogger(self):
         self.battery_nt = NetworkTables.getTable('Battery')
@@ -144,8 +149,9 @@ class main():
        
 
     def sendBatteryData(self):
-        self.battery_nt.putNumber("Voltage", random.random())
-            
+        self.r.update_status()
+        self.battery_nt.putNumber("Voltage", self.r.battery)
+
     def quit(self):
         logging.info("Quitting...")
         self.stop_threads = True
@@ -157,7 +163,8 @@ class main():
         if logErr:
             logging.critical("Competition robot should not quit, but yours did!")
             logging.critical(err)
-        
+            logging.critical(traceback.print_tb(err.__traceback__))
+                    
 
         try:
             self.broadcastNoCode()
@@ -181,7 +188,10 @@ class main():
                 bT.reset()
 
             if not self.disabled:
-                
+               
+                # need to physically enable the bot
+                # if it was previously disabled
+                self.enable()
 
                 self.timer.start()
                 try:
@@ -205,6 +215,7 @@ class main():
                     time.sleep(ts)
             else:
                 self.disable()
+
         self.disable()
 
             
