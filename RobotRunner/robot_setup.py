@@ -15,7 +15,7 @@ except FileExistsError:
 out = subprocess.check_output("pwd").decode("utf8")
 path = out[0:len(out)-1] + "/" + "run.py"
 
-process = subprocess.Popen(["python", path], shell=False)
+process = subprocess.Popen(["python3", path], shell=False)
 
 code = True
 
@@ -74,7 +74,7 @@ while True:
         os.system(f"tar -xf {file_name} -C RobotCode")
         os.system("rm " + file_name)
         process.kill()
-        process = subprocess.Popen(["python", path], shell=False)
+        process = subprocess.Popen(["python3", path], shell=False)
 
 
         

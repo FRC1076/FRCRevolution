@@ -21,8 +21,12 @@ import buffer
 #import robot
 import pikitlib
 
+
 logging.basicConfig(level=logging.ERROR)
 
+MODE_COLORS = {'Teleop':0x6600cc, 'Auton':0x6600cc}
+DISABLE_COLOR = 0xff0000
+ENABLE_COLOR = 0x00ff00
 
 class main():
     def __init__(self):
@@ -47,12 +51,13 @@ class main():
             sys.path.append(f'{dir}/RobotCode')
             from RobotCode.robot import MyRobot
             self.r = MyRobot()
-            
+
             return True
         except Exception as e:
             logging.critical("Looks like you dont have any code!")
             logging.critical("Send code with deploy.py")
             logging.critical(f"ERROR: {e}")
+            logging.critical(traceback.print_tb(e.__traceback__))
             self.catchErrorAndLog(e, False)
             return False
         
@@ -122,8 +127,10 @@ class main():
         
         if m == "Teleop":
             self.r.teleopInit()
+            self.r.set_led_color(MODE_COLORS['Teleop'])
         elif m == "Auton":
             self.r.autonomousInit()
+            self.r.set_led_color(MODE_COLORS['Auton'])
 
         self.current_mode = m
 
@@ -136,10 +143,12 @@ class main():
     def disable(self):
         if not self.r.disabled:
             self.r.disable()
+            self.r.set_led_color(DISABLE_COLOR)
 
     def enable(self):
         if self.r.disabled:
             self.r.enable()
+            self.r.set_led_color(MODE_COLORS.get(self.current_mode,ENABLE_COLOR))
 
     def setupBatteryLogger(self):
         self.battery_nt = NetworkTables.getTable('Battery')
