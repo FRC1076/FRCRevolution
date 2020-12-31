@@ -34,9 +34,6 @@ To do the initial software installation you will also need:
 * Administrative access to your home router (not strictly necesary, but highly encouraged)
 
 ### Installation Steps
-Follow these steps to install this code on the SD card that revolution robotics comes with. Alternatively, you could put Raspbian on another SD card and swap out the built in card on the brain. The second route is the 'safer' route because it ensures that you won't inadvertently mess up the code that came with the kit, but it requires you to have an SD card with Raspbian on it.
-
-If you do go the second route, you can still follow the steps below with a few alterations - logging in is different, and you don't have to disable the revvy daemon.
 
 1. Get out the Revolution Robotics [brain](https://revolutionrobotics.org/pages/getting-to-know-your-robot-brain).
 2. Remove the SD card that came with the kit, and insert your new card.
