@@ -15,23 +15,37 @@ Files from the above repos have been hand-copied into this one and modified as n
 to make stuff work. This is not a good strategy for creating sustainable/supportable
 code, but our goal was getting basic functionality done quickly. Any improvements are welcome!
 
-
-## Installation
-Here is how to install this code on your Revolution Robotics kit.
-
 ### What you will need
-For initial installation:
-* Your robot's brain, connected and powered up
-* USB keyboard
-* HDMI-capable monitor/display
-* Mini-USB to USB-A adapter
-* Mini (or whatever) HDMI to normal HDMI adapter
-* HDMI cable
-* Administrative access to your home router (not strictly necesary, but highly encouraged)
 
-For programming and driving the robot:
+To run this code on your robot you will need:
+* Your robot's brain
+* An SD Card with Raspbian on it (prob should pre-build these w/the software on it)
 * A USB xbox controller
 * A laptop with the following capabilities:
   * Can run python (basically this means a Windows, Mac, or Linux machine, no Chromebooks)
   * Has a USB port you can plug the xbox controller into
 
+To do the initial software installation you will also need:
+* USB keyboard
+* HDMI-capable monitor/display
+* Micro USB to USB-A adapter
+* Mini HDMI to normal HDMI adapter
+* HDMI cable
+* Administrative access to your home router (not strictly necesary, but highly encouraged)
+
+### Installation Steps
+Follow these steps to install this code on the SD card that revolution robotics comes with. Alternatively, you could put Raspbian on another SD card and swap out the built in card on the brain. The second route is the 'safer' route because it ensures that you won't inadvertently mess up the code that came with the kit, but it requires you to have an SD card with Raspbian on it.
+
+If you do go the second route, you can still follow the steps below with a few alterations - logging in is different, and you don't have to disable the revvy daemon.
+
+1. Get out the Revolution Robotics [brain](https://revolutionrobotics.org/pages/getting-to-know-your-robot-brain).
+2. Remove the SD card that came with the kit, and insert your new card.
+3. Using a Mini-USB to USB-A adapter, conect a keyboard to the micro USB OTG Data port (NOT the charging port!) on the brain.
+4. Using a Mini HDMI to HDMI adapter, connect a monitor to the Mini HDMO port on the brain.
+5. Power on the brain.
+6. Log into Raspbian and launch the console. Type in "sudo raspi-config" and configure the following things:
+(to be continued)
+7. Now that you've configured Raspbian for your wifi, you should have internet access (woot!). Pull the latest version of this repo with the following console command:
+(tbd)
+8. On your laptop, clone the repo as well and install the requirements.
+(tbd)
