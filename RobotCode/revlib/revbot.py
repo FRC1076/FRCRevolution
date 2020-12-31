@@ -9,13 +9,14 @@ from revvy.robot.imu import IMU
 from revvy.robot.led_ring import RingLed
 from revvy.robot.ports.motor import create_motor_port_handler
 from revvy.robot.ports.sensor import create_sensor_port_handler
-from revvy.robot.sound import Sound
+from revvy.hardware_dependent.sound import SoundControlV2
 from revvy.hardware_dependent.rrrc_transport_i2c import RevvyTransportI2C
 
 from revvy.robot.ports.motors.dc_motor import DcMotorController
 from revvy.robot.configurations import Motors
 from revvy.robot.configurations import Sensors
 from revvy.robot.ports.sensors.simple import bumper_switch, hcsr04
+
 
 MOTOR_PORTS = ['motor_1','motor_2','motor_3','motor_4','motor_5','motor_6']
 SENSOR_PORTS = ['sensor_1','sensor_2','sensor_3','sensor_4']
@@ -28,10 +29,12 @@ class RevBot():
         self._robot_control = self._comm_interface.create_application_control()
         self._ring_led = RingLed(self._robot_control)
 
-        #self._sound = TBD
+        self._sound = SoundControlV2()
 
         #self._status = RobotStatusIndicator(self._robot_control)
         self._status_updater = McuStatusUpdater(self._robot_control)
+        self._status_updater.reset()
+
         self._battery = BatteryStatus(0, 0, 0)
         self._imu = IMU()
    
@@ -45,6 +48,9 @@ class RevBot():
         self._status_updater.enable_slot("axl", self._imu.update_axl_data)
         self._status_updater.enable_slot("gyro", self._imu.update_gyro_data)
         self._status_updater.enable_slot("yaw", self._imu.update_yaw_angles)
+
+        #set led color to purple on init
+        self.set_led_color(0x6600cc)
 
     def set_led_color(self, color_code):
         '''
@@ -65,6 +71,7 @@ class RevBot():
                 self._status_updater.disable_slot(f"motor_{m.id}")
 
         self.disabled = True
+        #self.set_led_color(0xff0000)
 
     def enable(self):
         '''
@@ -75,6 +82,7 @@ class RevBot():
                 self._status_updater.enable_slot(f"motor_{m.id}", m.update_status)
 
         self.disabled = False
+        #self.set_led_color(0x6600cc)
 
     def get_motor(self, port):
 
@@ -116,6 +124,9 @@ class RevBot():
         self._status_updater.enable_slot(port, sensor.update_status)
 
         return sensor
+
+    def play_sound(self,sound_file):
+        self._sound.play_sound(sound_file)
 
     def update_status(self):
         self._status_updater.read()

@@ -7,5 +7,3 @@ sys.path.append(f'{dir}')
 from .revbot import RevBot
 from .motor_group import MotorGroup
 from .drive import Drive
-from .motor import get_motor
-from .sensor import get_bumper, get_ultra
